@@ -566,7 +566,7 @@ namespace channels
         write_status write(const Type &value)
         {
             std::unique_lock<std::mutex> lock(_mutex);
-            wait(_writable, lock, std::bind(&is_writable, this));
+            wait(_writable, lock, std::bind(&channels::buffered_channel<Type>::is_writable, this));
             return write_channel<const Type &>(value, lock);
         }
 
