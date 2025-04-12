@@ -11,7 +11,7 @@ static void signal_handler(int signal)
     channel->write(signal);
 }
 
-int main(int argc, char **argv)
+int main()
 {
     int signal;
 

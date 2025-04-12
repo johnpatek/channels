@@ -175,6 +175,9 @@ namespace channels
             case channel_state::closed:
                 status = read_status::closed;
                 break;
+            case channel_state::writable:
+                throw channel_exception(channel_error::illegal_write);
+                break;
             }
             return status;
         }
@@ -198,8 +201,7 @@ namespace channels
                 lock.unlock();
                 _readable.notify_one();
                 break;
-            case channel_state::closing:
-            case channel_state::closed:
+            default:
                 throw channel_exception(channel_error::illegal_write);
             }
             return status;
@@ -408,13 +410,14 @@ namespace channels
     {
     private:
         std::vector<Type> _values;
-        std::size_t _count;
         std::mutex _mutex;
         std::condition_variable _readable;
         std::condition_variable _writable;
-        bool _open;
         std::size_t _read_position;
         std::size_t _write_position;
+        std::size_t _count;
+        bool _open;
+        
 
         bool is_readable() const
         {

@@ -12,9 +12,9 @@
 class threadpool
 {
 private:
+    bool _active;
     channels::buffered_channel<std::function<void()>> _queue;
     std::vector<std::thread> _workers;
-    bool _active;
 
 public:
     threadpool(std::size_t worker_count = std::thread::hardware_concurrency(), std::size_t queue_size = std::thread::hardware_concurrency() * 10) : _active(true), _queue(queue_size)
@@ -72,11 +72,9 @@ public:
     }
 };
 
-static std::chrono::milliseconds queue_time(const std::chrono::steady_clock::time_point &start);
-
 static void benchmark(std::size_t threads, std::size_t block_size);
 
-int main(int argc, char **argv)
+int main()
 {
     for (std::size_t threads = 1; threads <= std::thread::hardware_concurrency(); threads++)
     {
@@ -121,9 +119,4 @@ void benchmark(std::size_t threads, std::size_t block_size)
         latency += future.get();
     }
     std::cout << "avg latency(" << threads << " thread(s), " << block_size << " bytes):" << (latency / futures.size()).count() << std::endl;
-}
-
-std::chrono::milliseconds queue_time(const std::chrono::steady_clock::time_point &start)
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 }
